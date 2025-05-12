@@ -1,0 +1,54 @@
+/* Reset básico */
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  display: flex;
+  height: 100vh;
+  justify-content: center;
+  align-items: center;
+  background: #f0f4f8;
+  font-family: Arial, sans-serif;
+}
+
+.calculator {
+  background: #fff;
+  border-radius: 10px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+  overflow: hidden;
+  width: 320px;
+}
+
+#display {
+  background: #222;
+  color: #0f0;
+  font-size: 2rem;
+  text-align: right;
+  padding: 20px;
+}
+
+.buttons {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+}
+
+button {
+  font-size: 1.2rem;
+  padding: 20px;
+  border: 1px solid #ddd;
+  background: #fafafa;
+  cursor: pointer;
+}
+
+button:hover { background: #f1f1f1; }
+
+button[data-action="operator"] { background: #ffd700; }
+
+button[data-action="calculate"] {
+  background: #4caf50;
+  color: #fff;
+  grid-row: span 2;
+}
+
+.zero {
+  grid-column: span 2;
+}
