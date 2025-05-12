@@ -1,40 +1,137 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Calculadora</title>
-  <link rel="stylesheet" href="style.css" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Calculadora Animada</title>
+  <style>
+    /* Reset */
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      display: flex; justify-content: center; align-items: center;
+      height: 100vh; background: #eef2f7;
+      font-family: 'Segoe UI', Tahoma, sans-serif;
+    }
+    .calculator {
+      background: #fff; border-radius: 12px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+      overflow: hidden; width: 350px;
+      transform: scale(0);
+      animation: popIn 0.3s ease-out forwards;
+    }
+    @keyframes popIn {
+      to { transform: scale(1); }
+    }
+    #display {
+      background: #282c34; color: #61dafb;
+      text-align: right; padding: 20px;
+      font-size: 2.5rem; min-height: 60px;
+      overflow-wrap: break-word;
+    }
+    .buttons {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+    }
+    button {
+      border: none; padding: 20px;
+      font-size: 1.3rem; background: #f7f7f7;
+      cursor: pointer; transition: transform 0.1s, background 0.2s, box-shadow 0.2s;
+    }
+    button:hover {
+      background: #e2e2e2;
+    }
+    button:active {
+      transform: scale(0.95);
+      box-shadow: inset 0 2px 5px rgba(0,0,0,0.2);
+    }
+    button[data-action="operator"] { background: #ffd166; }
+    button[data-action="operator"]:hover { background: #ffcf66; }
+    button[data-action="calculate"] {
+      background: #06d6a0; color: #fff;
+      grid-row: span 2;
+    }
+    button.zero { grid-column: span 2; }
+  </style>
 </head>
 <body>
   <div class="calculator">
     <div id="display">0</div>
     <div class="buttons">
-      <!-- Fila de controles -->
       <button data-action="clear">C</button>
       <button data-action="delete">⌫</button>
       <button data-action="operator">÷</button>
       <button data-action="operator">×</button>
-      <!-- Dígitos 7-8-9 y resta -->
-      <button>7</button>
-      <button>8</button>
-      <button>9</button>
-      <button data-action="operator">−</button>
-      <!-- Dígitos 4-5-6 y suma -->
-      <button>4</button>
-      <button>5</button>
-      <button>6</button>
-      <button data-action="operator">+</button>
-      <!-- Dígitos 1-2-3 y igual -->
-      <button>1</button>
-      <button>2</button>
-      <button>3</button>
-      <button data-action="calculate" rowspan="2">=</button>
-      <!-- Cero y punto decimal -->
-      <button class="zero">0</button>
-      <button data-action="decimal">.</button>
+      <button>7</button><button>8</button><button>9</button><button data-action="operator">−</button>
+      <button>4</button><button>5</button><button>6</button><button data-action="operator">+</button>
+      <button>1</button><button>2</button><button>3</button><button data-action="calculate">=</button>
+      <button class="zero">0</button><button data-action="decimal">.</button>
     </div>
   </div>
-  <script src="script.js"></script>
+  <script>
+    (function() {
+      const display = document.getElementById('display');
+      let expression = '';
+
+      function updateDisplay(text) {
+        display.textContent = text;
+      }
+
+      function calculate() {
+        try {
+          // Reemplazar símbolos visuales por JS
+          const sanitized = expression.replace(/×/g, '*').replace(/÷/g, '/').replace(/−/g, '-');
+          const result = Function('return ' + sanitized)();
+          expression = String(result);
+          updateDisplay(expression);
+        } catch {
+          expression = '';
+          updateDisplay('Error');
+        }
+      }
+
+      document.querySelector('.buttons').addEventListener('click', e => {
+        const btn = e.target;
+        const action = btn.dataset.action;
+        const val = btn.textContent;
+        if (!action) {
+          // dígito
+          expression += val;
+          updateDisplay(expression);
+        } else if (action === 'decimal') {
+          if (!expression.endsWith('.') && !expression.match(/[.\+\-×÷]$/)) {
+            expression += val;
+            updateDisplay(expression);
+          }
+        } else if (action === 'clear') {
+          expression = '';
+          updateDisplay('0');
+        } else if (action === 'delete') {
+          expression = expression.slice(0, -1);
+          updateDisplay(expression || '0');
+        } else if (action === 'operator') {
+          if (!expression.match(/[+\-×÷]$/)) {
+            expression += val;
+            updateDisplay(expression);
+          }
+        } else if (action === 'calculate') {
+          calculate();
+        }
+      });
+
+      // Soporte de teclado
+      window.addEventListener('keydown', e => {
+        const key = e.key;
+        if (/\d/.test(key)) document.querySelector(`button:contains('${key}')`).click();
+        if (key === '.') document.querySelector("button[data-action='decimal']").click();
+        if (key === 'Enter' || key === '=') document.querySelector("button[data-action='calculate']").click();
+        if (key === 'Backspace') document.querySelector("button[data-action='delete']").click();
+        if (['+', '-', '*', '/'].includes(key)) {
+          const map = {'*': '×', '/': '÷', '-': '−', '+': '+'};
+          document.querySelector(`button[data-action='operator'][textContent='${map[key]}']`).click();
+        }
+        if (key.toLowerCase() === 'c') document.querySelector("button[data-action='clear']").click();
+      });
+    })();
+  </script>
 </body>
 </html>
