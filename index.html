@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Calculadora Animada</title>
   <style>
-    /* Variables de paleta */
+  
     :root {
       --bg-body: #121212;
       --bg-calculator: #1E1E1E;
@@ -18,59 +18,168 @@
       --operator-hover: #35e8d8;
       --calculate-bg: #CF6679;
       --calculate-hover: #e68190;
+      --sparkle-color: #FFD700;
     }
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
+      position: relative;
       display: flex; justify-content: center; align-items: center;
       height: 100vh; background: var(--bg-body);
       font-family: 'Segoe UI', Tahoma, sans-serif;
+      overflow: hidden;
     }
+    /* Background shapes container */
+    #bg-shapes {
+      position: absolute; top: 0; left: 0;
+      width: 100%; height: 100%;
+      z-index: 0;
+      pointer-events: none;
+    }
+    .shape {
+      position: absolute; opacity: 0.1;
+      z-index: 0;
+    }
+    /* Shape styles with increased speed */
+    .shape1 {
+      width: 100px; height: 100px;
+      background: var(--calculate-bg);
+      border-radius: 50%;
+      top: 10%; left: -15%;
+      animation: move1 15s linear infinite, rotate 10s linear infinite;
+    }
+    .shape2 {
+      width: 150px; height: 150px;
+      background: var(--operator-bg);
+      clip-path: polygon(50% 0%, 100% 100%, 0% 100%);
+      top: 70%; left: 100%;
+      animation: move2 17s linear infinite, rotate 12s linear infinite reverse;
+    }
+    .shape3 {
+      width: 80px; height: 80px;
+      background: var(--sparkle-color);
+      border-radius: 10%;
+      top: 40%; left: 50%;
+      animation: move3 12s ease-in-out infinite, rotate 7s linear infinite;
+    }
+    .shape4 {
+      width: 120px; height: 120px;
+      background: var(--btn-hover);
+      clip-path: polygon(25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50%);
+      top: -20%; left: 60%;
+      animation: move4 20s linear infinite, rotate 15s linear infinite;
+    }
+    .shape5 {
+      width: 60px; height: 60px;
+      background: var(--btn-default);
+      border-radius: 0 50% 50% 50%;
+      top: 80%; left: -10%;
+      animation: move5 14s ease-in-out infinite reverse, rotate 9s linear infinite;
+    }
+    /* Additional shapes */
+    .shape6 {
+      width: 90px; height: 90px;
+      background: var(--calculate-hover);
+      clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%);
+      top: 20%; left: 80%;
+      animation: move6 18s linear infinite, rotate 9s linear infinite reverse;
+    }
+    .shape7 {
+      width: 60px; height: 60px;
+      background: var(--operator-hover);
+      border-radius: 20%;
+      top: 80%; left: 50%;
+      animation: move7 16s ease-in-out infinite, rotate 8s linear infinite;
+    }
+    /* Movement animations */
+    @keyframes move1 { 0% { transform: translate(0,0); } 100% { transform: translate(500px,500px); } }
+    @keyframes move2 { 0% { transform: translate(0,0); } 100% { transform: translate(-600px,-600px); } }
+    @keyframes move3 { 0%,100% { transform: translate(0,0); } 50% { transform: translate(200px,-150px); } }
+    @keyframes move4 { 0% { transform: translate(0,0); } 100% { transform: translate(-700px,400px); } }
+    @keyframes move5 { 0% { transform: translate(0,0); } 100% { transform: translate(400px,-300px); } }
+    @keyframes move6 { 0% { transform: translate(0,0); } 100% { transform: translate(-400px,500px); } }
+    @keyframes move7 { 0% { transform: translate(0,0); } 100% { transform: translate(600px,-400px); } }
+    @keyframes rotate { to { transform: rotate(360deg); } }
+
+    /* Calculator container */
     .calculator {
-      background: var(--bg-calculator); border-radius: 12px;
+      position: relative;
+      z-index: 1;
+      background: var(--bg-calculator);
+      border-radius: 12px;
       box-shadow: 0 10px 25px rgba(0,0,0,0.5);
-      overflow: hidden; width: 350px;
+      overflow: hidden;
+      width: 350px;
       transform: scale(0);
       animation: popIn 0.3s ease-out forwards;
     }
     @keyframes popIn { to { transform: scale(1); } }
     #display {
-      background: var(--bg-display); color: var(--text-display);
-      text-align: right; padding: 20px;
-      font-size: 2.5rem; min-height: 60px;
-      overflow-wrap: break-word;
+      position: relative;
+      background: var(--bg-display);
+      color: var(--text-display);
+      text-align: right;
+      padding: 20px;
+      font-size: 2.5rem;
+      min-height: 60px;
+      overflow: hidden;
+      white-space: nowrap;
     }
     .buttons {
-      display: grid; grid-template-columns: repeat(4, 1fr);
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
     }
     button {
-      border: none; padding: 20px;
-      font-size: 1.3rem; background: var(--btn-default);
+      border: none;
+      padding: 20px;
+      font-size: 1.3rem;
+      background: var(--btn-default);
       color: var(--text-display);
       cursor: pointer;
       transition: transform 0.1s, background 0.2s, box-shadow 0.2s;
+      position: relative;
+      overflow: hidden;
     }
     button:hover { background: var(--btn-hover); }
-    button:active {
-      transform: scale(0.95);
-      box-shadow: inset 0 2px 5px var(--btn-active-shadow);
-    }
-    button[data-action="operator"] {
-      background: var(--operator-bg);
-    }
-    button[data-action="operator"]:hover {
-      background: var(--operator-hover);
-    }
-    button[data-action="calculate"] {
-      background: var(--calculate-bg); color: #fff;
-      grid-row: span 2;
-    }
-    button[data-action="calculate"]:hover {
-      background: var(--calculate-hover);
-    }
+    button:active { transform: scale(0.95); box-shadow: inset 0 2px 5px var(--btn-active-shadow); }
+    button[data-action="operator"] { background: var(--operator-bg); }
+    button[data-action="operator"]:hover { background: var(--operator-hover); }
+    button[data-action="calculate"] { background: var(--calculate-bg); color: #fff; grid-row: span 2; }
+    button[data-action="calculate"]:hover { background: var(--calculate-hover); }
     .zero { grid-column: span 2; }
+
+    /* Sparkle styling */
+    .sparkle {
+      position: absolute;
+      width: 6px; height: 6px;
+      background: var(--sparkle-color);
+      opacity: 0;
+      border-radius: 50%;
+      pointer-events: none;
+      animation: sparkle-fade 1s ease-out forwards;
+    }
+    @keyframes sparkle-fade { 0% { transform: scale(0); opacity: 1; } 50% { transform: scale(1.5); opacity: 1; } 100% { transform: scale(1); opacity: 0; } }
+
+    /* Slide-in operator */
+    .operator-fly {
+      position: absolute;
+      font-size: 2rem;
+      color: var(--operator-bg);
+      opacity: 0;
+      animation: fly-in 0.5s ease-out forwards;
+    }
+    @keyframes fly-in { 0% { transform: translateX(-50px) translateY(10px) scale(0.5); opacity: 1; } 100% { transform: translateX(0) translateY(0) scale(1); opacity: 1; } }
   </style>
 </head>
 <body>
+  <div id="bg-shapes">
+    <div class="shape shape1"></div>
+    <div class="shape shape2"></div>
+    <div class="shape shape3"></div>
+    <div class="shape shape4"></div>
+    <div class="shape shape5"></div>
+    <div class="shape shape6"></div>
+    <div class="shape shape7"></div>
+  </div>
   <div class="calculator">
     <div id="display">0</div>
     <div class="buttons">
@@ -88,63 +197,63 @@
     (function() {
       const display = document.getElementById('display');
       let expression = '';
-
-      function updateDisplay(text) { display.textContent = text; }
-
-      function calculate() {
-        try {
-          const sanitized = expression.replace(/×/g, '*').replace(/÷/g, '/').replace(/−/g, '-');
-          let result = Function('return ' + sanitized)();
-          // Limitar decimales a máximo 6 y eliminar ceros finales
-          result = parseFloat(result.toFixed(6));
-          expression = String(result);
-          updateDisplay(expression);
-        } catch {
-          expression = '';
-          updateDisplay('Error');
+      function adjustFont() {
+        display.style.fontSize = '2.5rem';
+        while (display.scrollWidth > display.clientWidth && parseFloat(getComputedStyle(display).fontSize) > 12) {
+          let current = parseFloat(getComputedStyle(display).fontSize);
+          display.style.fontSize = (current - 2) + 'px';
         }
       }
-
+      function updateDisplay(text) { display.textContent = text; adjustFont(); }
+      function createSparkles() {
+        for (let i = 0; i < 10; i++) {
+          const s = document.createElement('div');
+          s.className = 'sparkle';
+          const x = Math.random() * display.clientWidth;
+          const y = Math.random() * display.clientHeight;
+          s.style.left = x + 'px'; s.style.top = y + 'px';
+          display.appendChild(s);
+          setTimeout(() => display.removeChild(s), 1000);
+        }
+      }
+      function flyOperator(op) {
+        const fly = document.createElement('div'); fly.className = 'operator-fly'; fly.textContent = op;
+        fly.style.left = '20px'; fly.style.top = (display.clientHeight/2 - 20) + 'px';
+        display.appendChild(fly);
+        setTimeout(() => display.removeChild(fly), 500);
+      }
+      function calculate() {
+        try {
+          const sanitized = expression.replace(/×/g,'*').replace(/÷/g,'/').replace(/−/g,'-');
+          let result = Function('return '+sanitized)();
+          result = parseFloat(result.toFixed(6)); expression = String(result);
+          updateDisplay(expression); createSparkles();
+        } catch {
+          expression=''; updateDisplay('Error'); display.classList.add('shake'); setTimeout(() => display.classList.remove('shake'), 500);
+        }
+      }
       document.querySelector('.buttons').addEventListener('click', e => {
         const btn = e.target, action = btn.dataset.action, val = btn.textContent;
-        if (!action) {
-          expression += val;
-          updateDisplay(expression);
-        } else if (action === 'decimal') {
-          if (!/[.\+\-×÷]$/.test(expression)) {
-            expression += val;
-            updateDisplay(expression);
-          }
-        } else if (action === 'clear') {
-          expression = '';
-          updateDisplay('0');
-        } else if (action === 'delete') {
-          expression = expression.slice(0,-1);
-          updateDisplay(expression || '0');
-        } else if (action === 'operator') {
-          if (!/[+\-×÷]$/.test(expression) && expression !== '') {
-            expression += val;
-            updateDisplay(expression);
-          }
-        } else if (action === 'calculate') {
-          calculate();
-        }
+        if (!action) { expression+=val; updateDisplay(expression); }
+        else if (action==='decimal' && !/[\.\+\-×÷]$/.test(expression)) { expression+=val; updateDisplay(expression); }
+        else if (action==='clear') { expression=''; updateDisplay('0'); }
+        else if (action==='delete') { expression=expression.slice(0,-1); updateDisplay(expression||'0'); }
+        else if (action==='operator' && !/[+\-×÷]$/.test(expression) && expression!=='') { expression+=val; updateDisplay(expression); flyOperator(val); }
+        else if (action==='calculate') { calculate(); }
       });
-
       window.addEventListener('keydown', e => {
-        const key = e.key;
-        if (/\d/.test(key)) {
-          document.querySelector(`button:not([data-action])[textContent="${key}"]`)?.click();
-        }
-        if (key === '.') document.querySelector("button[data-action='decimal']")?.click();
-        if (key === 'Enter' || key === '=') document.querySelector("button[data-action='calculate']")?.click();
-        if (key === 'Backspace') document.querySelector("button[data-action='delete']")?.click();
-        if (['+','-','*','/'].includes(key)) {
-          const m = {'*':'×','/':'÷','-':'−','+':'+'};
-          document.querySelector(`button[data-action='operator'][textContent="${m[key]}"]`)?.click();
-        }
-        if (key.toLowerCase() === 'c') document.querySelector("button[data-action='clear']")?.click();
+        const key=e.key;
+        if (/\d/.test(key)) document.querySelector(`button:not([data-action])[textContent="${key}"]`)?.click();
+        if (key==='.') document.querySelector("button[data-action='decimal']")?.click();
+        if (['Enter','='].includes(key)) document.querySelector("button[data-action='calculate']")?.click();
+        if (key==='Backspace') document.querySelector("button[data-action='delete']")?.click();
+        if (['+','-','*','/'].includes(key)) { const map={'*':'×','/':'÷','-':'−','+':'+'}; document.querySelector(`button[data-action='operator'][textContent="${map[key]}"]`)?.click(); }
+        if (key.toLowerCase()==='c') document.querySelector("button[data-action='clear']")?.click();
       });
+      const styleEl=document.createElement('style');
+      styleEl.textContent=`@keyframes shake{0%,100%{transform:translateX(0);}25%{transform:translateX(-5px);}75%{transform:translateX(5px);}}#display.shake{animation:shake 0.5s;}`;
+      document.head.appendChild(styleEl);
+      adjustFont();
     })();
   </script>
 </body>
